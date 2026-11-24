@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "guild": "Blue Lodge Official Guild",
+  "updated_at": "2026-11-24T20:04:30Z",
+  "modules": [
+    {
+      "id": "hunting-buddy",
+      "name": "Hunting Buddy",
+      "version": "2.6.1",
+      "author": "Blue Lodge Guild",
+      "category": "outdoors",
+      "tagline": "Field & Water GIS (Hunt + Fish): resilient weather & spatial provider registry, cached lake dossiers & official DNR contour maps, shoreline-clipped bathymetry, stream/trail tracing, 1m LiDAR contours, live river gauges, and Q&A.",
+      "repo": "https://github.com/dabe-19/mod-hunting-buddy.git",
+      "commit": "7c36d0ce74ba4370971aa1835f6a6f4354e497fd",
+      "venv_mode": "shared_locked",
+      "hardware_badges": [
+        "no-special-hardware",
+        "offline-capable",
+        "zero-keys-required"
+      ],
+      "has_ui": true,
+      "github_repo": "https://github.com/dabe-19/mod-hunting-buddy.git",
+      "visibility": "public-github",
+      "updated_at": "2026-11-24T20:04:30Z"
+    },
+    {
+      "id": "shop-bench",
+      "name": "Shop Bench",
+      "version": "2.6.9",
+      "author": "Blue Lodge Guild",
+      "category": "workshop",
+      "tagline": "Pro Mechanic's Workbench & Fleet Ledger: Torque-style OBD-II/ELM327/Carly Bluetooth gauges, web-controlled Windows BT-to-TCP bridge, 45+ SAE PIDs & Torque/OBDb/opendbc importers, signal/correlation & CAN-bus lab, exportable diagnostic & AI Copilot reports (.md/.html/.json).",
+      "repo": "https://github.com/dabe-19/mod-shop-bench.git",
+      "commit": "1ab7b1b916570c148760d768a6a9c978acf4dd28",
+      "venv_mode": "shared_locked",
+      "hardware_badges": [
+        "offline-capable",
+        "zero-keys-required",
+        "obd2-canbus-ready"
+      ],
+      "has_ui": true,
+      "github_repo": "https://github.com/dabe-19/mod-shop-bench.git",
+      "visibility": "public-github",
+      "updated_at": "2026-11-24T20:04:30Z"
+    },
+    {
+      "id": "skywatch",
+      "name": "SkyWatch",
+      "version": "1.0.1",
+      "author": "Blue Lodge Guild",
+      "category": "telemetry",
+      "tagline": "Local Field, Ham Radio, Aviation & Space-Weather Situational Bench: live Leaflet map + NEXRAD radar, NWS alerts, METAR/TAF, NOAA SWPC Kp/SFI/HF propagation, Open-Meteo 72h activity windows, and optional ADS-B/RTL-SDR feeds (zero API keys).",
+      "repo": "https://github.com/dabe-19/mod-skywatch.git",
+      "commit": "a8bcc40655a45d54f5c20dbf4fd90a50d8ca825e",
+      "venv_mode": "shared_locked",
+      "hardware_badges": [
+        "no-special-hardware",
+        "zero-keys-required",
+        "sdr-adsb-optional"
+      ],
+      "has_ui": true,
+      "github_repo": "https://github.com/dabe-19/mod-skywatch.git",
+      "visibility": "public-github"
+    }
+  ]
+}

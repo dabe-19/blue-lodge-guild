@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "id": "my-module",
+  "name": "My Community Module",
+  "version": "0.1.0",
+  "author": "Your Name",
+  "license": "MIT",
+  "category": "community",
+  "tagline": "Short description of what this Blue Lodge module adds.",
+  "hardware_badges": ["no-special-hardware"],
+  "requires_core": ">=2026.11",
+  "runtime": {
+    "venv_mode": "shared_locked",
+    "python_packages": []
+  },
+  "provides": {
+    "tools_schema": "tools/schemas.json",
+    "tools_dispatcher": "tools/dispatch.sh",
+    "tool_bundle": "+my_module",
+    "domain_keywords": "example keyword",
+    "context_hook": "hooks/context.sh",
+    "ui": {
+      "js": "ui/panel.js",
+      "css": "ui/panel.css"
+    }
+  },
+  "permissions": {
+    "tier": "A",
+    "network_egress": [],
+    "filesystem_rw": [".george/module_data/my-module"],
+    "privileged_docker": false,
+    "secrets_required": []
+  },
+  "healthcheck": "hooks/health.sh"
+}
