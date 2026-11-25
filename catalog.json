@@ -1,17 +1,17 @@
 {
   "schema_version": 1,
   "guild": "Blue Lodge Official Guild",
-  "updated_at": "2026-11-25T00:16:00Z",
+  "updated_at": "2026-11-25T00:21:00Z",
   "modules": [
     {
       "id": "hunting-buddy",
       "name": "Hunting Buddy",
-      "version": "2.6.1",
+      "version": "2.6.2",
       "author": "Blue Lodge Guild",
       "category": "outdoors",
       "tagline": "Field & Water GIS (Hunt + Fish): resilient weather & spatial provider registry, cached lake dossiers & official DNR contour maps, shoreline-clipped bathymetry, stream/trail tracing, 1m LiDAR contours, live river gauges, and Q&A.",
       "repo": "https://github.com/dabe-19/mod-hunting-buddy.git",
-      "commit": "12e703254471302f28676d375da6f7be6a286ed0",
+      "commit": "9f31f41b4fb952d5cdd05a6546d688b5372b0f70",
       "venv_mode": "shared_locked",
       "hardware_badges": [
         "no-special-hardware",
@@ -21,7 +21,7 @@
       "has_ui": true,
       "github_repo": "https://github.com/dabe-19/mod-hunting-buddy.git",
       "visibility": "public-github",
-      "updated_at": "2026-11-25T00:16:00Z"
+      "updated_at": "2026-11-25T00:21:00Z"
     },
     {
       "id": "shop-bench",
