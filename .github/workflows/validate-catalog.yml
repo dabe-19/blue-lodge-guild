@@ -1,0 +1,104 @@
+name: Validate Guild Catalog & Security Audit
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  validate-guild-catalog:
+    name: Schema, SHA Verification & Static Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Guild catalog
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validate catalog.json & Audit Every Pinned Module SHA
+        run: |
+          python3 - <<'PY'
+          import ast, json, re, shutil, subprocess, sys, tempfile
+          from pathlib import Path
+
+          cat_path = Path("catalog.json")
+          if not cat_path.is_file():
+              sys.exit("FAIL: catalog.json missing")
+          cat = json.loads(cat_path.read_text(encoding="utf-8"))
+          mods = cat.get("modules")
+          if not isinstance(mods, list) or not mods:
+              sys.exit("FAIL: catalog.json must contain a non-empty 'modules' array")
+
+          seen_ids = set()
+          id_re = re.compile(r"^[a-z0-9][a-z0-9_-]{1,48}$")
+          sha_re = re.compile(r"^[0-9a-f]{40}$")
+          ver_re = re.compile(r"^\d+\.\d+\.\d+$")
+          sink_re = re.compile(r"\b(innerHTML|outerHTML|insertAdjacentHTML|document\.write|eval\s*\()\b")
+          allowed_licenses = {"Apache-2.0", "MIT", "BSD-3-Clause", "BSD-2-Clause", "ISC", "MPL-2.0"}
+
+          for m in mods:
+              mid = str(m.get("id") or "")
+              ver = str(m.get("version") or "")
+              repo = str(m.get("repo") or "")
+              sha = str(m.get("commit") or "")
+              if not id_re.fullmatch(mid):
+                  sys.exit(f"FAIL: invalid module id '{mid}'")
+              if mid in seen_ids:
+                  sys.exit(f"FAIL: duplicate module id '{mid}'")
+              seen_ids.add(mid)
+              if not ver_re.fullmatch(ver):
+                  sys.exit(f"FAIL: module '{mid}' has non-SemVer version '{ver}'")
+              if not repo.startswith("https://github.com/"):
+                  sys.exit(f"FAIL: public Guild module '{mid}' repo must use https://github.com/... (got '{repo}')")
+              if not sha_re.fullmatch(sha):
+                  sys.exit(f"FAIL: module '{mid}' must pin a full 40-char commit SHA (got '{sha}')")
+
+              # Clone & verify exact pinned commit + static security gate
+              with tempfile.TemporaryDirectory(prefix=f"guild-audit-{mid}-") as tmp:
+                  dest = Path(tmp) / mid
+                  subprocess.run(["git", "clone", "--quiet", repo, str(dest)], check=True)
+                  subprocess.run(["git", "-C", str(dest), "checkout", "--quiet", sha], check=True)
+
+                  mj_path = dest / "module.json"
+                  if not mj_path.is_file():
+                      sys.exit(f"FAIL: {mid}@{sha[:8]} missing module.json")
+                  meta = json.loads(mj_path.read_text(encoding="utf-8"))
+                  if meta.get("id") != mid:
+                      sys.exit(f"FAIL: {mid} module.json id '{meta.get('id')}' != catalog id '{mid}'")
+                  if str(meta.get("version")) != ver:
+                      sys.exit(f"FAIL: {mid} module.json version '{meta.get('version')}' != catalog version '{ver}'")
+                  lic = str(meta.get("license") or "")
+                  if lic not in allowed_licenses:
+                      sys.exit(f"FAIL: {mid} license '{lic}' not in approved open-source allowlist {sorted(allowed_licenses)}")
+
+                  for py in dest.rglob("*.py"):
+                      if ".venv" in py.parts or "__pycache__" in py.parts:
+                          continue
+                      tree = ast.parse(py.read_text(encoding="utf-8"), filename=str(py))
+                      for node in ast.walk(tree):
+                          if isinstance(node, ast.Call):
+                              if isinstance(node.func, ast.Name) and node.func.id in ("eval", "exec", "__import__"):
+                                  if "tests" not in py.parts:
+                                      sys.exit(f"FAIL: {mid} disallowed call {node.func.id}() in {py.relative_to(dest)}:{node.lineno}")
+                              for kw in node.keywords:
+                                  if kw.arg == "shell" and isinstance(kw.value, ast.Constant) and kw.value.value is True:
+                                      sys.exit(f"FAIL: {mid} subprocess shell=True in {py.relative_to(dest)}:{node.lineno}")
+
+                  for js in dest.rglob("*.js"):
+                      for idx, line in enumerate(js.read_text(encoding="utf-8").splitlines(), 1):
+                          s = line.strip()
+                          if s.startswith("//") or s.startswith("*"):
+                              continue
+                          if sink_re.search(s):
+                              sys.exit(f"FAIL: {mid} disallowed DOM/eval sink in {js.relative_to(dest)}:{idx}")
+
+                  print(f"PASS: {mid} v{ver} @ {sha[:8]} ({lic}) — verified & audited.")
+
+          print(f"ALL {len(mods)} GUILD CATALOG MODULES PASSED AUDIT.")
+          PY
